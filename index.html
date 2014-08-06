@@ -72,21 +72,22 @@
                 Keep it simple to use
             </li>
             <li>
-                Option to use an agent/enhancement to automatically instrument an existing JAX-RS or Spring
+                Agent enhancement can be used to automatically instrument your existing JAX-RS or Spring
                 application
             </li>
         </ul>
 
         <h3>
-            Collect metrics in Production
+            Collecting metrics in Production
         </h3>
         <blockquote>
-            It is important that metrics collection must not add contention or blow out your memory.
+            It is important that metrics collection does not add contention or blow out your memory.
         </blockquote>
         <p>
             To collect metrics in production it is important to keep the overhead low and for the statistical counters
             to not introduce contention. Thankfully Doug Lea and friends have built some counters to do exactly what
-            we need as part of JSR166e/JDK8. Avaje Metrics makes use of <code>LongAdder</code> and <code>LongMaxUpdater</code> (backported from
+            we need as part of JSR166e/JDK8. Avaje Metrics makes use of <code>LongAdder</code> and
+            <code>LongMaxUpdater</code> (backported from
             JDK8). Some might say that Avaje Metrics is an glorified wrapper for LongAdder and LongMaxUpdater.
         </p>
 
@@ -104,25 +105,22 @@
 
         <p>
             Note that <code>BucketTimedMetric</code> provides a nice alternative to Histograms/Percentiles and I expect
-            users will
-            frequently look to using BucketTimedMetric on things like web/rest endpoints.
+            users will frequently look to using BucketTimedMetric on important timing points like web/rest endpoints.
         </p>
-
 
         <h3>
             Keep it simple
         </h3>
         <p>
             Simple is always good but if instrumenting your application is too much effort you won't be afforded the
-            time to actually do it.  Adding the metrics code is easy but adding timing metrics automatically via enhancement can be
+            time to actually do it. Adding the metrics code is easy but adding timing metrics automatically via enhancement can be
             next to no development effort (so you can get going fast and let the numbers show their value to the business).
         </p>
         <ul>
             <li>Easy to add metrics via code</li>
             <li>Easy to add timing metrics automatically via agent enhancement</li>
-            <li>Keep the internals simple - use LongAdder, LongMaxUpdater to be confident this thing isn't going to
-                adversely impact
-                performance
+            <li>Keep the internals simple - use LongAdder, LongMaxUpdater to be confident that metrics collection isn't
+                going to introduce contention, significantly increase memory consumption or GC overhead.
             </li>
         </ul>
 
@@ -163,10 +161,140 @@
         Add the following 2 dependencies to your project.
         </p>
         {% highlight xml %}
+        <dependency>
+            <groupId>org.avaje.metric</groupId>
+            <artifactId>avaje-metric-api</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.avaje.metric</groupId>
+            <artifactId>avaje-metric-core</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+        {% endhighlight %}
 
 
+        <h3>2. Enhancement</h3>
+
+        <p>
+            If you application already uses <code>@Singleton</code>, or Spring <code>@Service</code>, <code>@Component</code>, etc or JAX-RS <code>@Path</code> then you can
+            go ahead and use the <code>enhance-maven-plugin</code> to search for and instrument those classes for you.
+        </p>
+
+        <p>
+            If not then you can add <code>@Timed</code> to classes or methods that you want to be instrumented.
+        </p>
+
+        <p>
+            Using enhancement is optional. You can add metrics collection via code (although it is more than using
+            enhancement, especially
+            noting that when you use enhancment if exceptions are thrown those execution times into the separate
+            'error statistics').
+        </p>
+        <h4>Maven build plugin</h4>
+        <p>
+            To your maven pom add the plugin like below and specify the packages you wish it to scan for classes it
+            should enhance. Take note of the packages element in the maven plugin xml below.
+        </p>
+
+        {% highlight xml %}
+        <build>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.avaje.metric</groupId>
+                    <artifactId>enhance-maven-plugin</artifactId>
+                    <version>3.5.0</version>
+                    <executions>
+                        <execution>
+                            <id>main</id>
+                            <phase>process-classes</phase>
+                            <configuration>
+                                <classSource>target/classes</classSource>
+                                <packages>nz.co.kiwirail.**</packages>
+                                <transformArgs>debug=0</transformArgs>
+                            </configuration>
+                            <goals>
+                                <goal>enhance</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </build>
+        {% endhighlight %}
+
+        <h3>3. MetricReporter</h3>
+        <p>
+            Add a MetricReporter instance to your application.
+        </p>
+        {% highlight java %}
+        ...
+        import org.avaje.metric.report.FileReporter;
+        import org.avaje.metric.report.MetricReportManager;
+        ...
+
+        // Just use the simple FileReporter that comes with avaje-metric-core.
+        // Writes metrics in a csv format every 60 seconds. Defaults to write a
+        // daily file and keep a maximum of 20 files
+
+        FileReporter file = new FileReporter();
+        MetricReportManager reportManager = new MetricReportManager(60, file);
+        {% endhighlight %}
+
+
+        <h3>4. metric-name-mapping.txt (Optional)</h3>
+
+        <p>
+            You can optionally add a <em>metric-name-mapping.txt</em> file to your <em>src/main/resources</em>.
+            In this file you can put some key=value pairs that can be used to modify the metrics names - typically
+            trimming the package name part and adding some prefix's like web.api, web.sockets, data, integration.
+        </p>
+
+        <p>
+            The primary reason for doing this is so that it is easier to rollup/group related metrics and much of the
+            package name is redundant.
+        </p>
+
+        {% highlight properties %}
+        org.example.myapp.endpoint=web.api
+        org.example.myapp.repository.dao=dataaccess
+        org.example.myapp=myapp
+        {% endhighlight %}
+
+        <h3>5. Add Metrics via Code</h3>
+        <h4>TimedMetric</h4>
+
+        {% highlight java %}
+        package org.example.service;
+        ...
+        public class MyService {
+
+        /**
+        * Create a TimedMetric with name "org.example.service.MyService.sayHello".
+        * Typically the metrics are static fields to avoid some map lookup overhead.
+        */
+        private static final TimedMetric METRIC_SAY_HELLO =
+            MetricManager.getTimedMetric(MyService.class, "sayHello");
+
+        public String sayHello(String name) {
+
+          long startNanos = System.nanoTime();
+            try {
+            ...
+            return "Hello "+name;
+
+          } finally {
+            // A TimedMetric can collect both success and error statistics
+            // Here we add treating the event as a 'success'
+            METRIC_SAY_HELLO.addEventSince(true, startNanos);
+          }
+        }
 
         {% endhighlight %}
+
     </section>
 </div>
 
