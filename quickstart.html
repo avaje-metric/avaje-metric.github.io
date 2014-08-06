@@ -31,15 +31,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Avaje Metrics</a>
+          <a class="navbar-brand" href="/">Avaje Metrics</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav pull-right">
             <li ><a href="/"><span class="glyphicon glyphicon-home"></span>  Home</a></li>
-            <li class="active"><a href="/quickstart">Quick Start</a></li>
+            <li class="active"><a href="/quickstart">Getting Started</a></li>
             <li ><a href="/support">Support</a></li>
             <li ><a href="/documentation">Documentation</a></li>
-            <li ><a href="/releases">Releases</a></li>
             <li ><a href="https://github.com/avaje-metric"> <i class="fa fa-github"></i> Github</a></li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -48,14 +47,13 @@
 
   </div>
   <div id="main">    
-<div class="container">
-
-  <div class="jumbotron">
+<div class="jumbotron mini">
     <div class="container">
-      <h1>Quick start</h1>
-      <h2>Collecting application metrics in 4 steps</h2>
+      <h1>Getting started</h1>
     </div>
   </div>
+
+  <div class="container">
 
   <h2>1. Maven dependencies</h2>
   <p>
@@ -140,6 +138,28 @@
     <p>
       At this point you can run your application and metrics will be written to a csv file every minute.
     </p>
+    <h5>Output example:</h5>
+    <pre><code>
+00:00:51, lg, jvm.gc.ps-marksweep, count=4, time=1556
+00:00:51, lg, jvm.gc.ps-scavenge, count=48, time=6811
+00:00:51, dg, jvm.memory.heap, pct=23.0, init=61.75, used=210.21, committed=379.5, max=878.5
+00:00:51, dg, jvm.memory.nonheap, pct=4.0, init=23.44, used=9.12, committed=23.44, max=214.0
+00:00:51, dm, jvm.os.loadAverage, value=1.17
+00:00:51, dm, jvm.system.uptime, value=0.0
+00:00:51, lg, jvm.threads, current=5, peak=5, daemon=4
+00:00:51, tm, org.example.MyService.performLogin, count=34, avg=28972, max=39150, sum=985073, dur=60, err.count=0
+00:00:51, tm, org.example.MyService.checkWeather, count=1, avg=954, max=954, sum=954, dur=60, err.count=0
+  </code></pre>
+    <h5>Notes:</h5>
+    <ul>
+      <li>Times are reported in microseconds. avg=28972 means an average of 29 milliseconds.</li>
+      <li>If a metric had no events since the last collection it is considered 'empty' and not reported and
+        you won't see it in the output
+      </li>
+      <li>dur=60 means that the duration that the metric covers is 60 seconds. This is effectively the number
+        of seconds since the last collection (which is when the counters where last reset).
+      </li>
+    </ul>
 
 
     <h2>4. Refine metric names</h2>
