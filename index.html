@@ -1,74 +1,179 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
+<head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="description" content="Avaje-metric.github.io : Website for Avaje Metrics">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Avaje-metric.github.io</title>
-  </head>
+    <title>Avaje Metrics - Metrics for the JVM masses</title>
+</head>
 
-  <body>
+<body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/avaje-metric">View on GitHub</a>
+<!-- HEADER -->
+<div id="header_wrap" class="outer">
+    <header class="inner">
+        <a id="forkme_banner" href="https://github.com/avaje-metric">View on GitHub</a>
 
-          <h1 id="project_title">Avaje-metric.github.io</h1>
-          <h2 id="project_tagline">Website for Avaje Metrics</h2>
+        <h1 id="project_title">Avaje Metrics</h1>
 
-        </header>
-    </div>
+        <h2 id="project_tagline">Production metrics on the JVM</h2>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+    </header>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main_content_wrap" class="outer">
+    <section id="main_content" class="inner">
+        <h2>Overview</h2>
+
+        <p>
+            This project started as a fork of https://github.com/codahale/metrics but became significantly different.
+            Frequent reporting of metrics meant that Avaje Metrics has generally moved away from Moving Averages and
+            Histograms/percentiles to relatively simpler and cheaper counters (Count, Total, Average, Max). When
+            frequent collection of Max and Average latency is not sufficient you can look to use
+            <code>BucketTimedMetric</code> to
+            get a clearer picture of how latency is distributed (because generally it is not 'normally distributed').
+        </p>
+
+        <h4>Be aware that:</h4>
+        <ul>
+            <li>Statistics can lie</li>
+            <li>Latency is often not normally distributed (bell curve)</li>
+            <li>If you don't collect metrics frequently then interpreting what an 'average' or a 'max' value actually
+                means
+                can be difficult and potentially misleading.
+            </li>
+        </ul>
+
+        <h4>LongAdder</h4>
+
+        <p>
+            <code>LongAdder</code> and <code>LongMaxUpdater</code> are important implementation details that make
+            statistical counters viable in
+            production with low overhead and avoiding contention. There are alternatives but for Avaje Metrics these
+            are the
+            enabling factor that make this viable on busy multicore/multi-threaded JVM applications. Thankfully they
+            have been provided to us
+            by some clever folks - thanks Doug Lea and friends!!
+        </p>
+
+        <h2>Design Goals</h2>
+        <ul>
+            <li>Collect metrics in production with low overhead
+            <li>
+                Report metrics frequently to enable reasonable interpretation (Statistics can be misleading)
+            </li>
+            <li>
+                Keep it simple to use
+            </li>
+            <li>
+                Option to use an agent/enhancement to automatically instrument an existing JAX-RS or Spring
+                application
+            </li>
+        </ul>
+
         <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+            Collect metrics in Production
+        </h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+        <p>
+            To collect metrics in production it is important to keep the overhead low and for the statistical counters
+            to not introduce contention. Thankfully Doug Lea and friends have built some counters to do exactly what
+            we need as part of JSR166e/JDK8. Avaje Metrics makes use of LongAdder and LongMaxUpdater (backported from
+            JDK8). Some might say that Avaje Metrics is an glorified wrapper for LongAdder and LongMaxUpdater.
+        </p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+        <h3>
+            Report metrics frequently
+        </h3>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+        <p>
+            When metrics are reported relatively frequently then the ability to reason and interpret simple count,
+            total, mean and max values increases. Conversely, if instead a mean and max value related to a long period
+            of time like 1 hour then frequently they become relatively meaningless to interpret. This is due to
+            latency generally not being statistically 'normally' distributed. The argument for using percentiles and
+            histograms is strong if you don't collect metrics frequently enough.
+        </p>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+        <p>
+            Note that <code>BucketTimedMetric</code> provides a nice alternative to Histograms/Percentiles and I expect
+            users will
+            frequently look to using BucketTimedMetric on things like web/rest endpoints.
+        </p>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+        <h3>
+            Keep it simple
+        </h3>
+        <p>
+            Simple is always good but if instrumenting your application is too much effort you won't be afforded the
+            time to actually do it.  Adding the metrics code is easy but adding timing metrics automatically via enhancement can be
+            next to no development effort (so you can get going fast and let the numbers show their value to the business).
+        </p>
+        <ul>
+            <li>Easy to add metrics via code</li>
+            <li>Easy to add timing metrics automatically via agent enhancement</li>
+            <li>Keep the internals simple - use LongAdder, LongMaxUpdater to be confident this thing isn't going to
+                adversely impact
+                performance
+            </li>
+        </ul>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+        <h3>
+            Agent/Enhancement
+        </h3>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+        <p>
+            Use the metrics agent to instrument classes annotated with <code>@Singleton</code>, JAX-RS
+            <code>@Path</code>,
+            <code>@Consumes</code>, <code>@Produces</code> or Spring sterotypes <code>@Service</code>,
+            <code>@Component</code>, <code>@Repository</code> etc. This provides an
+            way to try it out on your existing application with little development effort.
+        </p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+        <h2>Business drivers</h2>
+        <p>
+            For developers collecting metrics on your application can be good fun and very interesting. It is worth
+            remembering that there are important questions and business drivers to motivate the collection and reporting
+            of these metrics.
+        </p>
+        <ul>
+            <li>
+                How is the application currently performing in Production (relative to some baseline)
+            </li>
+            <li>When do Seasonal/peak loads occur and effect do they have</li>
+            <li>Can performance trends be detected due to software releases, configuration changes, growing data</li>
+            <li>During development can likely performance issues be detected</li>
+            <li>What is the maximum load the system can handle</li>
+            <li>Are there specific SLA requirements that need to be monitored
+            </li>
+        </ul>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+        <h2>Getting Started</h2>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-    </div>
+        <h3>1. Maven dependencies</h3>
+        <p>
+        Add the following 2 dependencies to your project.
+        </p>
+        {% highlight xml %}
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
 
-    
 
-  </body>
+        {% endhighlight %}
+    </section>
+</div>
+
+<!-- FOOTER  -->
+<div id="footer_wrap" class="outer">
+    <footer class="inner">
+        <p>At some point metrics collection will become the 'norm'</p>
+    </footer>
+</div>
+
+
+</body>
 </html>
