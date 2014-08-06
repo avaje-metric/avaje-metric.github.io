@@ -1,3 +1,5 @@
+---
+---
 <!DOCTYPE html>
 <html>
 
@@ -33,10 +35,9 @@
         <p>
             This project started as a fork of https://github.com/codahale/metrics but became significantly different.
             Frequent reporting of metrics meant that Avaje Metrics has generally moved away from Moving Averages and
-            Histograms/percentiles to relatively simpler and cheaper counters (Count, Total, Average, Max). When
-            frequent collection of Max and Average latency is not sufficient you can look to use
-            <code>BucketTimedMetric</code> to
-            get a clearer picture of how latency is distributed (because generally it is not 'normally distributed').
+            Histograms/percentiles to relatively simpler and cheaper counters (count, total, mean, max). Additionally
+            <code>BucketTimedMetric</code> can be used if needed to provide a clear picture of how latency is
+            distributed (because generally it is not 'normally distributed').
         </p>
 
         <h4>Be aware that:</h4>
@@ -79,11 +80,13 @@
         <h3>
             Collect metrics in Production
         </h3>
-
+        <blockquote>
+            It is important that metrics collection must not add contention or blow out your memory.
+        </blockquote>
         <p>
             To collect metrics in production it is important to keep the overhead low and for the statistical counters
             to not introduce contention. Thankfully Doug Lea and friends have built some counters to do exactly what
-            we need as part of JSR166e/JDK8. Avaje Metrics makes use of LongAdder and LongMaxUpdater (backported from
+            we need as part of JSR166e/JDK8. Avaje Metrics makes use of <code>LongAdder</code> and <code>LongMaxUpdater</code> (backported from
             JDK8). Some might say that Avaje Metrics is an glorified wrapper for LongAdder and LongMaxUpdater.
         </p>
 
