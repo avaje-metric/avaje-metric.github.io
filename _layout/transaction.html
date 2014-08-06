@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta id="layout-head" />
-    <title>Avaje Metrics - Java Application performance metrics</title>
+    <title>avaje ebean</title>
     <link rel="shortcut icon" href="/images/favicon.ico" >
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/pygments.css" rel="stylesheet" type="text/css" />
@@ -31,16 +31,16 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Avaje Metrics</a>
+          <a class="navbar-brand" href="#">Ebean ORM</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav pull-right">
-            <li class="active"><a href="/"><span class="glyphicon glyphicon-home"></span>  Home</a></li>
+            <li ><a href="/"><span class="glyphicon glyphicon-home"></span>  Home</a></li>
             <li ><a href="/quickstart">Quick Start</a></li>
             <li ><a href="/support">Support</a></li>
-            <li ><a href="/documentation">Documentation</a></li>
+            <li class="active"><a href="/documentation">Documentation</a></li>
             <li ><a href="/releases">Releases</a></li>
-            <li ><a href="https://github.com/avaje-metric/avaje-metric-api"> <i class="fa fa-github"></i> Github</a></li>
+            <li ><a href="https://github.com/ebean-orm/avaje-ebeanorm"> <i class="fa fa-github"></i> Github</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -48,73 +48,63 @@
 
   </div>
   <div id="main">    
-<div class="jumbotron">
+<div class="jumbotron mini">
     <div class="container">
-      <h1>Avaje Metrics</h1>
-      <h2>Collect Java application metrics in production</h2>
+      <h1><a href="/documentation">Documentation</a> / Transactions</h1>
     </div>
   </div>
 
   <div class="container">
+  <div class="row">
+    <div class="col-md-3">
 
-    <div class="starter-template">
-      <h2>Version 3.5.0</h2>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-4 feature">
-        <h3>Low overhead</h3>
-
-        <p>To collect metrics in production it is important to keep the overhead low and for the statistical counters to
-          not introduce contention. JSR166e brings us <code>LongAdder</code> and <code>LongMaxUpdater</code> which were
-          built just for this task.</p>
-
-        <p>
-          Avaje Metrics won't introduce contention or blow out your memory.
-        </p>
-
-        <p>
-          <a class="btn btn-small btn-info" href="overhead">more</a>
-        </p>
-      </div>
-
-      <div class="col-sm-4 feature">
-        <h3>Collecting metrics in minutes</h3>
-        <p>An agent is provided so that you can instrument your JVM application without
-          having to write code. Classes annotated with <code>@Singleton</code>, JAX-RS <code>@Path</code> and
-          Spring <code>@Component</code>, <code>@Service</code> etc can be instrumented automatically.
-        </p>
-        <p>
-          Within minutes you can be gathering metrics across all the layers of your application.
-        </p>
-        <p>
-          <a class="" href="agent.html">agent ...</a>
-        </p>
-      </div>
-      <div class="col-sm-4 feature">
-        
-        <h3>Timers, Counters, Gauges</h3>
-        <p>
-
-        </p>
-        <p>
-          <a class="btn btn-large btn-info" href="quick-start">Quick start</a>
-        </p>
+    <div class="sidebar-nav">
+      <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <span class="visible-xs navbar-brand">Sidebar menu</span>
+        </div>
+        <div class="navbar-collapse collapse sidebar-navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li ><a href="/docs/transactions/implicit">Implicit Transactions</a></li>
+            <li ><a href="/docs/transactions/begincommit">Programmatic</a></li>
+            <li ><a href="/docs/transactions/transactional">@Transactional</a></li>
+            <li ><a href="/docs/transactions/txrunnable">TxRunnable, TxCallable</a></li>
+            <li ><a href="/docs/transactions/spring">Spring Transaction Manager</a></li>
+            <li ><a href="/docs/transactions/jta">JTA Transactions</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
       </div>
     </div>
-    <!-- //end of row -->
 
-  </div>
-  <!-- /.container -->    
+
+    </div>  
+    <div class="col-md-9">
+
+<div id="layout-body"></div> 
+
+   </div>
+
+    </div> <!-- /.row -->
+  </div>  <!-- /.container -->    
   </div>
 </div>
 
 <footer id="footer">
  <div class="doc-footer">
   <ul class="doc-footer-links">
-    <li><a href="/">Home</a></li>
+    <li><a href="/">Ebean ORM</a></li>
     <li> | </li>
-    <li><a href="/documentation">Documentation</a></li>
+    <li><a href="/metrics/index">Metrics</a></li>
+    <li> | </li>
+    <li><a href="/websitegenerator/index">Website Generator</a></li>
+    <li> | </li>
+    <li><a href="/jetty/index">Jetty Runnable War</a></li>
   </ul>
  </div>
 </footer>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta id="layout-head" />
+    <title>Avaje Metrics - Java Application performance metrics</title>
+    <link rel="shortcut icon" href="/images/favicon.ico" >
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/pygments.css" rel="stylesheet" type="text/css" />
+    <link href="/css/site.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  <div id="wrap">    
+    <div id="header">    
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Avaje Metrics</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav pull-right">
+            <li ><a href="/"><span class="glyphicon glyphicon-home"></span>  Home</a></li>
+            <li class="active"><a href="/quickstart">Quick Start</a></li>
+            <li ><a href="/support">Support</a></li>
+            <li ><a href="/documentation">Documentation</a></li>
+            <li ><a href="/releases">Releases</a></li>
+            <li ><a href="https://github.com/avaje-metric"> <i class="fa fa-github"></i> Github</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+  </div>
+  <div id="main">    
+<div class="container">
+
+  <div class="jumbotron">
+    <div class="container">
+      <h1>Quick start</h1>
+      <h2>Collecting application metrics in 4 steps</h2>
+    </div>
+  </div>
+
+  <h2>1. Maven dependencies</h2>
+  <p>
+    Add the following dependencies
+  </p>
+
+<div class="syntax xml"><div class="highlight"><pre>    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>avaje-metric-api<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>avaje-metric-core<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+
+    <h2>2. Maven plugin enhancement</h2>
+    <p>
+      Add the maven plugin below specifying the packages that should be scanned for classes
+      annotated with <code>@Singleton</code>, <code>@Path</code>, <code>@Service</code> etc.
+    </p>
+    <p>
+      You can also use the Avaje Metrics <code>@Timed</code> annotation.
+    </p>
+
+    <div class="syntax xml"><div class="highlight"><pre>    <span class="nt">&lt;build&gt;</span>
+      <span class="nt">&lt;plugins&gt;</span>
+
+        <span class="nt">&lt;plugin&gt;</span>
+          <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+          <span class="nt">&lt;artifactId&gt;</span>enhance-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+          <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+          <span class="nt">&lt;executions&gt;</span>
+            <span class="nt">&lt;execution&gt;</span>
+              <span class="nt">&lt;id&gt;</span>main<span class="nt">&lt;/id&gt;</span>
+              <span class="nt">&lt;phase&gt;</span>process-classes<span class="nt">&lt;/phase&gt;</span>
+              <span class="nt">&lt;configuration&gt;</span>
+                <span class="nt">&lt;classSource&gt;</span>target/classes<span class="nt">&lt;/classSource&gt;</span>
+                <span class="nt">&lt;packages&gt;</span>org.example.myapp.**<span class="nt">&lt;/packages&gt;</span>
+                <span class="nt">&lt;transformArgs&gt;</span>debug=1<span class="nt">&lt;/transformArgs&gt;</span>
+              <span class="nt">&lt;/configuration&gt;</span>
+              <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>enhance<span class="nt">&lt;/goal&gt;</span>
+              <span class="nt">&lt;/goals&gt;</span>
+            <span class="nt">&lt;/execution&gt;</span>
+          <span class="nt">&lt;/executions&gt;</span>
+        <span class="nt">&lt;/plugin&gt;</span>
+
+      <span class="nt">&lt;/plugins&gt;</span>
+    <span class="nt">&lt;/build&gt;</span>
+
+    
+</pre></div>
+</div>
+
+
+    <h2>3. Reporting</h2>
+    <p>
+      Add MetricReporter to your application. This has a Timer that will fire periodically
+      and collect the metrics and send then to a reporter.
+    </p>
+
+<div class="syntax java"><div class="highlight"><pre>    <span class="kn">import</span> <span class="nn">org.avaje.metric.report.FileReporter</span><span class="o">;</span>
+    <span class="kn">import</span> <span class="nn">org.avaje.metric.report.MetricReportManager</span><span class="o">;</span>
+    <span class="o">...</span>
+
+    <span class="c1">// Just use the simple FileReporter that comes with avaje-metric-core.</span>
+    <span class="c1">// Writes metrics in a csv format every 60 seconds. Defaults to write a</span>
+    <span class="c1">// daily file and keep a maximum of 20 files</span>
+
+    <span class="n">FileReporter</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileReporter</span><span class="o">();</span>
+    <span class="n">MetricReportManager</span> <span class="n">reportManager</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricReportManager</span><span class="o">(</span><span class="mi">60</span><span class="o">,</span> <span class="n">file</span><span class="o">);</span>
+</pre></div>
+</div>
+
+
+    <h2>... and you're off</h2>
+    <p>
+      At this point you can run your application and metrics will be written to a csv file every minute.
+    </p>
+
+
+    <h2>4. Refine metric names</h2>
+    <p>
+      The metric names are the full package class and method names. This is ok but you might want to modify
+      those names because they are long and you want to use some common prefixes like <code>web.api</code>,
+      <code>service</code>, <code>db</code>, <code>integration</code> instead. Using the common prefixes can make it
+      easier to rollup/group related metrics together.
+    </p>
+
+    <p>
+      Add a file called <code>metric-name-mapping.txt</code> into <code>src/main/resources</code> and
+      add some name=value pairs which will be used to truncate/replace part or all of the package name.
+    </p>
+
+<div class="syntax properties"><div class="highlight"><pre><span class="na">org.example.myapp.endpoint</span><span class="o">=</span><span class="s">web.api</span>
+<span class="na">org.example.myapp.repository.dao</span><span class="o">=</span><span class="s">dataaccess</span>
+<span class="na">org.example.myapp</span><span class="o">=</span><span class="s">myapp</span>
+</pre></div>
+</div>
+
+
+
+  </div>
+  <!-- /.container -->    
+  </div>
+</div>
+
+<footer id="footer">
+ <div class="doc-footer">
+  <ul class="doc-footer-links">
+    <li><a href="/">Home</a></li>
+    <li> | </li>
+    <li><a href="/documentation">Documentation</a></li>
+  </ul>
+ </div>
+</footer>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  </body>
+</html>
