@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta id="layout-head" />
     <title>Avaje Metrics - Java Application performance metrics</title>
+      
     <link rel="shortcut icon" href="/images/favicon.ico" >
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/pygments.css" rel="stylesheet" type="text/css" />
@@ -18,7 +19,9 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
+
+
+</head>
   <body>
   <div id="wrap">    
     <div id="header">    
@@ -58,6 +61,178 @@
 
     <div class="page-content col-lg-9">
       <h2>Enhancement</h2>
+
+<h5 class="mvm">Quick links: </h5>
+<ul>
+  <li><a href="#mavenPlugin">Maven Plugin</a></li>
+  <li><a href="#agent">Agent</a></li>
+  <li><a href="#nameMapping">metric-name-mapping.txt</a></li>
+  <li><a href="#bytecode">Bytecode specifics</a></li>
+</ul>
+
+
+<a class="anchor" name="mavenPlugin"></a>
+
+<h3>Maven Plugin</h3>
+
+<p>
+  The maven plugin uses the agent to enhance the classes. You need to specify the
+  packages that you want the agent to search for classes that it should enhance.
+</p>
+
+<h5>packages</h5>
+
+<p>
+  The packages specified are scanned for classes
+  annotated with <code>@Singleton</code>, <code>@Path</code>, <code>@Service</code> etc
+  as well as the Avaje Metrics <code>@Timed</code> annotation.
+</p>
+<h5>debug=0..9</h5>
+
+<p>
+  In the transformArgs element you can specify a debug level from 0 to 9 which provides some
+  debug logging of what the enhancement process is doing.
+</p>
+
+<div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>enhance-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+          <span class="nt">&lt;id&gt;</span>main<span class="nt">&lt;/id&gt;</span>
+          <span class="nt">&lt;phase&gt;</span>process-classes<span class="nt">&lt;/phase&gt;</span>
+          <span class="nt">&lt;configuration&gt;</span>
+            <span class="nt">&lt;classSource&gt;</span>target/classes<span class="nt">&lt;/classSource&gt;</span>
+            <span class="nt">&lt;packages&gt;</span>org.example.myapp.**<span class="nt">&lt;/packages&gt;</span>
+            <span class="nt">&lt;transformArgs&gt;</span>debug=1<span class="nt">&lt;/transformArgs&gt;</span>
+          <span class="nt">&lt;/configuration&gt;</span>
+          <span class="nt">&lt;goals&gt;</span>
+            <span class="nt">&lt;goal&gt;</span>enhance<span class="nt">&lt;/goal&gt;</span>
+          <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+      <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+
+  <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</pre></div>
+</div>
+
+<a class="anchor" name="mavenPlugin"></a>
+
+<h3>Agent</h3>
+
+<p>
+  The agent utilises ASM (repackaged and included with the agent) to perform the enhancement. Most often I'd expect
+  people to not use the agent directly and instead use the maven plugin but you certainly can. You can
+  use the agent using the usual javaagent command line and alternatively you can load the agent at
+  runtime using the <a href="https://github.com/avaje-common/avaje-agentloader"><code>avaje-agentloader</code>.</a>
+</p>
+<h5>Maven artifact</h5>
+<div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>avaje-metric-agent<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+<p>
+  If you want to find out exactly how the enhancement works you want to review the <a
+    href="https://github.com/avaje-metric/avaje-metric-agent">source code for the agent.</a>
+</p>
+
+<a class="anchor" name="nameMapping"></a>
+
+<h3>metric-name-mapping.txt</h3>
+
+<p>
+  When the agent starts it searches for all metric-name-mapping.txt resources in the classpath.
+  These resources are loaded using Properties and are expected to be in properties format of
+  name=value pairs per line. These name=value pairs are then sorted by longest name ... and this
+  is the order in which they are searched in order to transform/truncate the default metric names
+  (of package.Class.method) into typically shorter metric names that often have common prefixs
+  like <code>web.api</code> etc.
+</p>
+
+<a class="anchor" name="bytecode"></a>
+
+<h3>Bytecode specifics</h3>
+
+<p>
+  So when the agent determines that a particular class should be enhanced it adds some bytecode.
+  The source for this is at <a href="https://github.com/avaje-metric/avaje-metric-agent">https://github.com/avaje-metric/avaje-metric-agent</a>.
+</p>
+<h5>ADD STATIC FIELDS</h5>
+<p>
+  Say the agent determines that there are 3 methods that it is going to enhance and
+  2 of those are TimedMetric and the 3rd is a BucketTimedMetric.  The agent will generate
+  bytecode that is equivilent to the Java code below.
+</p>
+<div class="syntax java"><div class="highlight"><pre><span class="c1">// Add one static field for each method</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="n">TimedMetric</span> <span class="n">_$metric_1</span><span class="o">;</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="n">TimedMetric</span> <span class="n">_$metric_2</span><span class="o">;</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="n">BucketTimedMetric</span> <span class="n">_$metric_3</span><span class="o">;</span>
+
+<span class="c1">// create a static initialisation block if</span>
+<span class="c1">// one does not already exist. Otherwise add</span>
+<span class="c1">// the _$initMetrics() to the existing one.</span>
+<span class="kd">static</span> <span class="o">{</span>
+  <span class="n">_$initMetrics</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="c1">// Add this method to initialise each metric</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="n">_$initMetrics</span><span class="o">()</span> <span class="o">{</span>
+  <span class="n">_$metric_1</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getTimedMetric</span><span class="o">(</span><span class="s">&quot;simpleSerivce.doSomething&quot;</span><span class="o">);</span>
+  <span class="n">_$metric_2</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getTimedMetric</span><span class="o">(</span><span class="s">&quot;simpleSerivce.doSomethingElse&quot;</span><span class="o">);</span>
+  <span class="n">_$metric_3</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getTimedMetric</span><span class="o">(</span><span class="s">&quot;simpleSerivce.doBucketSomething&quot;</span><span class="o">,</span> <span class="mi">100</span><span class="o">,</span> <span class="mi">200</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>
+  Having the _$initMetrics() method means that is it easy to either add the static initialisation
+  block or add the call to _$initMetrics(); to an existing static initialisation block.
+</p>
+<p>
+  Note that the metric names and bucket ranges have been determined at this point.
+</p>
+<h5>ENHANCE METHODS</h5>
+<p>
+  Each timed method is enhanced using the ASM AdviceAdapter. In Java terms it looks
+  something like the below.
+</p>
+<div class="syntax java"><div class="highlight"><pre><span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span> <span class="o">{</span>
+
+  <span class="c1">// local field to store the start nanos</span>
+  <span class="kt">long</span> <span class="n">_$metricStart</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+  <span class="k">try</span> <span class="o">{</span>
+
+    <span class="c1">// The original method code in here ...</span>
+    <span class="o">...</span>
+
+    <span class="c1">// opCode is one of the return opcodes;</span>
+    <span class="n">_$metric_1</span><span class="o">.</span><span class="na">operationEnd</span><span class="o">(</span><span class="n">opCode</span><span class="o">,</span> <span class="n">_$metricStart</span><span class="o">);</span>
+
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">RuntimeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="c1">// opCode = ATHROW;</span>
+    <span class="n">_$metric_1</span><span class="o">.</span><span class="na">operationEnd</span><span class="o">(</span><span class="n">opCode</span><span class="o">,</span> <span class="n">_$metricStart</span><span class="o">);</span>
+    <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>
+  Note that there was a conscience decision to have the operationEnd() method on TimedMetric
+  and BucketTimedMetric and pass the opcode and start nanos. This was so that the added bytecode
+  was as simple and minimalist as possible. In the case where you want to turn off metric collection with enhanced
+  code the added bytecode is still executed but the TimedMetric.operationEnd() method is a NOOP.
+  The operationEnd() methods do look a little clunky on the API but it serves a reasonable purpose.
+</p>
     </div>
 
     <div class="col-lg-3 hidden-md">
@@ -68,26 +243,21 @@
         <a href="/documentation">DOCUMENTATION</a>
       </h5>
       <ul class="side-nav">
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/metrictypes">Metric types</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/reporting">Reporting</a>
-  </li>
-  <li class="active">
-    <i class="fa fa-chevron-right"></i>
-  <a href="/enhancement">Enhancement</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/components">Components</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/background">Background</a>
-  </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/metrictypes">Metric types</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/reporting">Reporting</a>
+          </li>
+          <li class="active">
+          <i class="fa fa-chevron-right"></i> <a href="/enhancement">Enhancement</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/components">Components</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/background">Background</a>
+          </li>
       </ul>
       </div>
 

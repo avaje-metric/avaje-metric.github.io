@@ -1,4 +1,4 @@
-avaje-metric.github.io
-======================
+avaje-metric-website
+====================
 
-Website for Avaje Metrics
+The source for the website 

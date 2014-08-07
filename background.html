@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta id="layout-head" />
     <title>Avaje Metrics - Java Application performance metrics</title>
+      
     <link rel="shortcut icon" href="/images/favicon.ico" >
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/pygments.css" rel="stylesheet" type="text/css" />
@@ -18,7 +19,9 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
+
+
+</head>
   <body>
   <div id="wrap">    
     <div id="header">    
@@ -58,6 +61,50 @@
 
     <div class="page-content col-lg-9">
       <h2>Background</h2>
+
+<h5 class="mvm">Quick links: </h5>
+<ul>
+  <li><a href="#motivation">Project motivation</a></li>
+  <li><a href="#bucket">BucketTimedMetic</a></li>
+  <li><a href="#counter">CounterMetric</a></li>
+  <li><a href="#value">ValueMetric</a></li>
+  <li><a href="#gaugelong">GaugeLongMetric</a></li>
+  <li><a href="#gaugedouble">GaugeDoubleMetric</a></li>
+</ul>
+
+<a class="anchor" name="motivation"></a>
+
+<h3>Project motivation</h3>
+
+<p>
+  Around 2012 I began looking for a Java metrics library to adopt. There are a great many to look at but the one that
+  I liked the most was https://github.com/codahale/metrics which is a very successful metrics library. For Timed events
+  Codahale metrics emphasises Moving Averages and
+  Histograms/percentiles. One of my driving
+  desires was to report metrics every minute or better and when I did I started to have a preference for relatively
+  simpler and cheaper counters (Count, Total, Average, Max)
+</p>
+
+<h5>Moving Averages</h5>
+
+<p>
+  Moving Averages are good, but when collecting and reporting metrics every minute I found the expotentially weighted
+  moving averages
+  to be quite laggy. I found the simpler counters (Count, Total, Mean, Max) easier to interpret and represented a
+  more honest representation of the actual latency for any given minute. If you didn't collect and report the statistics
+  every minute (or more frequently) then the Moving
+  Averages would be useful great but the intention for avaje-metrics is to collect and report the statistics every
+  minute by default.
+</p>
+
+<h5>Histograms/Percentiles</h5>
+<p>
+Percentiles are definately the way to go if the period in which you are monitoring is relatively long. Said another way,
+  if the period you are collecting metrics for is 1 hour then simple counters like Mean and Max can be next to useless -
+  the server could have spent 55 minutes in normal millisecond response and then bad shit happened and for 5 minutes
+  the reponse times went off the charts - a single mean and max is not going to provide any insight into that. HOWEVER, the
+  intent is to collect every minute and once you do that statistical.
+</p>
     </div>
 
     <div class="col-lg-3 hidden-md">
@@ -68,26 +115,21 @@
         <a href="/documentation">DOCUMENTATION</a>
       </h5>
       <ul class="side-nav">
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/metrictypes">Metric types</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/reporting">Reporting</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/enhancement">Enhancement</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/components">Components</a>
-  </li>
-  <li class="active">
-    <i class="fa fa-chevron-right"></i>
-  <a href="/background">Background</a>
-  </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/metrictypes">Metric types</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/reporting">Reporting</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/enhancement">Enhancement</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/components">Components</a>
+          </li>
+          <li class="active">
+          <i class="fa fa-chevron-right"></i> <a href="/background">Background</a>
+          </li>
       </ul>
       </div>
 

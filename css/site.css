@@ -255,7 +255,7 @@ footer {
     padding-left: 0px;
 }
 .side-nav li {
-  font-size: 18px;
+  font-size: 16px;
   padding-left: 5px;
   margin-top: 10px;
 }
@@ -263,10 +263,7 @@ footer {
 .side-nav li.active {
 }
 .side-nav li i {
-  font-size: 15px;
-}
-.side-nav li.active i {
-  Xcolor: orange;
+  font-size: 13px;
 }
 .side-nav li.active a {
   color: black;
@@ -274,6 +271,17 @@ footer {
 a.nav-link {
   font-weight: bold;
 }
+.mtl {
+  margin-top: 60px;
+}
 .mvm {
   margin-top:25px;
+}
+.intro p {
+  margin-left:20px;
+}
+pre.console {
+  background: #111;
+  color:#eee;
+  font-weight: 600;
 }

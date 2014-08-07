@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta id="layout-head" />
     <title>Avaje Metrics - Java Application performance metrics</title>
+      
     <link rel="shortcut icon" href="/images/favicon.ico" >
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/pygments.css" rel="stylesheet" type="text/css" />
@@ -18,7 +19,9 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
+
+
+</head>
   <body>
   <div id="wrap">    
     <div id="header">    
@@ -49,7 +52,7 @@
   <div id="main">    
 <div class="jumbotron mini">
     <div class="container">
-      <h1><a href="/documentation">Documentation</a>  </h1>
+      <h1><a href="/documentation">Documentation</a> / Metric Types </h1>
     </div>
   </div>
 
@@ -88,29 +91,26 @@
     know which methods are invoking errors and differences in execution time of errors versus successful execution.
   </p>
 
-  <div class="syntax java"><div class="highlight"><pre>  <span class="c1">// Declare the metric (typically as a static field)</span>
+  <div class="syntax java"><div class="highlight"><pre><span class="c1">// Declare the metric (typically as a static field)</span>
+<span class="kd">static</span> <span class="kd">final</span> <span class="n">TimedMetric</span> <span class="n">timedUserLogin</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getTimedMetric</span><span class="o">(</span><span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;performLogin&quot;</span><span class="o">);</span>
 
-  <span class="kd">static</span> <span class="kd">final</span> <span class="n">TimedMetric</span> <span class="n">timedUserLogin</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getTimedMetric</span><span class="o">(</span><span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;performLogin&quot;</span><span class="o">);</span>
-  <span class="o">...</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">performLogin</span><span class="o">()</span> <span class="o">{</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">performLogin</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kt">long</span> <span class="n">startNanos</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
 
-    <span class="kt">long</span> <span class="n">startNanos</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="o">...</span>
 
-    <span class="k">try</span> <span class="o">{</span>
-      <span class="o">...</span>
-
-    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-      <span class="c1">// Add the event to the success statistics</span>
-      <span class="n">timedUserLogin</span><span class="o">.</span><span class="na">addEventSince</span><span class="o">(</span><span class="kc">true</span><span class="o">,</span> <span class="n">startNanos</span><span class="o">);</span>
-    <span class="o">}</span>
+  <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+    <span class="c1">// Add the event to the success statistics</span>
+    <span class="n">timedUserLogin</span><span class="o">.</span><span class="na">addEventSince</span><span class="o">(</span><span class="kc">true</span><span class="o">,</span> <span class="n">startNanos</span><span class="o">);</span>
   <span class="o">}</span>
-  
+<span class="o">}</span>
 </pre></div>
 </div>
 
   <h5>Output example:</h5>
-<pre><code> 23:59:38, tm, org.test.MyService.performLogin, count=1, avg=954, max=954, sum=954, dur=31, err.count=0
+<pre class="console"><code> 23:59:38, tm, org.test.MyService.performLogin, count=1, avg=954, max=954, sum=954, dur=31, err.count=0
 </code></pre>
 
   <a class="anchor" name="bucket"></a>
@@ -135,28 +135,28 @@
     distinct execution paths and monitor the slow non-cached execution path more accurately.
   </p>
 
-<div class="syntax java"><div class="highlight"><pre>  <span class="c1">// Declare the metric with 4 bucket ranges of:</span>
-  <span class="c1">//    0 - 100 milliseconds</span>
-  <span class="c1">//  100 - 200 milliseconds</span>
-  <span class="c1">//  200 - 300 milliseconds</span>
-  <span class="c1">//  300+      milliseconds</span>
+<div class="syntax java"><div class="highlight"><pre><span class="c1">// Declare the metric with 4 bucket ranges of:</span>
+<span class="c1">//    0 - 100 milliseconds</span>
+<span class="c1">//  100 - 200 milliseconds</span>
+<span class="c1">//  200 - 300 milliseconds</span>
+<span class="c1">//  300+      milliseconds</span>
 
-  <span class="kd">static</span> <span class="kd">final</span> <span class="n">BucketTimedMetric</span> <span class="n">timedUserLogin</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getBucketTimedMetric</span><span class="o">(</span><span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;performLogin&quot;</span><span class="o">,</span> <span class="mi">100</span><span class="o">,</span> <span class="mi">200</span><span class="o">,</span> <span class="mi">300</span><span class="o">);</span>
-  <span class="o">...</span>
+<span class="kd">static</span> <span class="kd">final</span> <span class="n">BucketTimedMetric</span> <span class="n">timedUserLogin</span> <span class="o">=</span>
+     <span class="n">MetricManager</span><span class="o">.</span><span class="na">getBucketTimedMetric</span><span class="o">(</span><span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;performLogin&quot;</span><span class="o">,</span> <span class="mi">100</span><span class="o">,</span> <span class="mi">200</span><span class="o">,</span> <span class="mi">300</span><span class="o">);</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">performLogin</span><span class="o">()</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">performLogin</span><span class="o">()</span> <span class="o">{</span>
 
-    <span class="kt">long</span> <span class="n">startNanos</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+  <span class="kt">long</span> <span class="n">startNanos</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
 
-    <span class="k">try</span> <span class="o">{</span>
+  <span class="k">try</span> <span class="o">{</span>
     <span class="o">...</span>
 
 
-    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-      <span class="c1">// Add the event to the success statistics</span>
-      <span class="n">timedUserLogin</span><span class="o">.</span><span class="na">addEventSince</span><span class="o">(</span><span class="kc">true</span><span class="o">,</span> <span class="n">startNanos</span><span class="o">);</span>
-    <span class="o">}</span>
+  <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+    <span class="c1">// Add the event to the success statistics</span>
+    <span class="n">timedUserLogin</span><span class="o">.</span><span class="na">addEventSince</span><span class="o">(</span><span class="kc">true</span><span class="o">,</span> <span class="n">startNanos</span><span class="o">);</span>
   <span class="o">}</span>
+<span class="o">}</span>
 </pre></div>
 </div>
   <a class="anchor" name="counter"></a>
@@ -164,16 +164,15 @@
   <p>
     Metric based on a counter (long value) that counts discrete events like 'user logged in'.
   </p>
-<div class="syntax java"><div class="highlight"><pre>  <span class="c1">// Declare the counter (typically as a static field)</span>
-  <span class="kd">static</span> <span class="kd">final</span> <span class="n">CounterMetric</span> <span class="n">userLoginCounter</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getCounterMetric</span><span class="o">(</span><span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;userLogin&quot;</span><span class="o">);</span>
+<div class="syntax java"><div class="highlight"><pre><span class="c1">// Declare the counter (typically as a static field)</span>
+<span class="kd">static</span> <span class="kd">final</span> <span class="n">CounterMetric</span> <span class="n">loginCounter</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getCounterMetric</span><span class="o">(</span><span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;userLogin&quot;</span><span class="o">);</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">performUserLogin</span><span class="o">()</span> <span class="o">{</span>
+
+  <span class="c1">// increment the counter</span>
+  <span class="n">loginCounter</span><span class="o">.</span><span class="na">markEvent</span><span class="o">();</span>
   <span class="o">...</span>
-
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">performUserLogin</span><span class="o">()</span> <span class="o">{</span>
-
-    <span class="c1">// increment the counter</span>
-    <span class="n">userLoginCounter</span><span class="o">.</span><span class="na">markEvent</span><span class="o">();</span>
-    <span class="o">...</span>
-  <span class="o">}</span>
+<span class="o">}</span>
 </pre></div>
 </div>
   <a class="anchor" name="value"></a>
@@ -181,36 +180,34 @@
   <p>
     Metric used when the event has a value like 'bytes sent' or 'lines processed'.
   </p>
-  <div class="syntax java"><div class="highlight"><pre>  <span class="c1">// Declare the metric (typically as a static field)</span>
-  <span class="kd">static</span> <span class="kd">final</span> <span class="n">ValueMetric</span> <span class="n">bytesSentMetric</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getValueMetric</span><span class="o">(</span><span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;bytesSent&quot;</span><span class="o">);</span>
-  <span class="o">...</span>
+  <div class="syntax java"><div class="highlight"><pre><span class="c1">// Declare the metric (typically as a static field)</span>
+<span class="kd">static</span> <span class="kd">final</span> <span class="n">ValueMetric</span> <span class="n">bytesSentMetric</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">getValueMetric</span><span class="o">(</span><span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;bytesSent&quot;</span><span class="o">);</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">performSomeIO</span><span class="o">()</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">performSomeIO</span><span class="o">()</span> <span class="o">{</span>
 
-    <span class="kt">long</span> <span class="n">bytesSent</span> <span class="o">=</span> <span class="o">...</span>
+  <span class="kt">long</span> <span class="n">bytesSent</span> <span class="o">=</span> <span class="o">...</span>
 
-    <span class="n">bytesSentMetric</span><span class="o">.</span><span class="na">addEvent</span><span class="o">(</span><span class="n">bytesSent</span><span class="o">);</span>
-    <span class="o">...</span>
-  <span class="o">}</span>
-  
+  <span class="n">bytesSentMetric</span><span class="o">.</span><span class="na">addEvent</span><span class="o">(</span><span class="n">bytesSent</span><span class="o">);</span>
+
+<span class="o">}</span>
 </pre></div>
 </div>
 
   <a class="anchor" name="gaugelong"></a>
   <h3>GaugeLongMetric</h3>
   <p>Metric based on an underlying gauge that reports long values.</p>
-<div class="syntax java"><div class="highlight"><pre>   <span class="kd">class</span> <span class="nc">ThreadCountGauge</span> <span class="kd">implements</span> <span class="n">GaugeLong</span> <span class="o">{</span>
+<div class="syntax java"><div class="highlight"><pre>  <span class="kd">class</span> <span class="nc">ThreadCountGauge</span> <span class="kd">implements</span> <span class="n">GaugeLong</span> <span class="o">{</span>
 
-       <span class="kd">public</span> <span class="kt">long</span> <span class="nf">getValue</span><span class="o">()</span> <span class="o">{</span>
-         <span class="k">return</span> <span class="n">threadMXBean</span><span class="o">.</span><span class="na">getThreadCount</span><span class="o">();</span>
-       <span class="o">}</span>
+     <span class="kd">public</span> <span class="kt">long</span> <span class="nf">getValue</span><span class="o">()</span> <span class="o">{</span>
+       <span class="k">return</span> <span class="n">threadMXBean</span><span class="o">.</span><span class="na">getThreadCount</span><span class="o">();</span>
      <span class="o">}</span>
+   <span class="o">}</span>
 
-   <span class="c1">// register the gauge</span>
-   <span class="n">GaugeLongMetric</span> <span class="n">gauge</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s">&quot;jvm.thread.count&quot;</span><span class="o">,</span> <span class="n">threadCountGauge</span><span class="o">);</span>
+  <span class="c1">// register the gauge</span>
+  <span class="n">GaugeLongMetric</span> <span class="n">gauge</span> <span class="o">=</span> <span class="n">MetricManager</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s">&quot;jvm.thread.count&quot;</span><span class="o">,</span> <span class="n">threadCountGauge</span><span class="o">);</span>
 
-   <span class="c1">// Note that typically you register and don&#39;t need the returned GaugeLongMetric</span>
-   <span class="c1">// instance. The MetricReporter will periodically get the current gauge value.</span>
+  <span class="c1">// Note that typically you register and don&#39;t need the returned GaugeLongMetric</span>
+  <span class="c1">// instance. The MetricReporter will periodically get the current gauge value.</span>
 </pre></div>
 </div>
 
@@ -237,7 +234,7 @@
     OS load average and system uptime.
   </p>
   <h5>Output example:</h5>
-<pre>
+<pre class="console">
 <code>
   00:00:51, lg, jvm.gc.ps-marksweep, count=4, time=1556
   00:00:51, lg, jvm.gc.ps-scavenge, count=48, time=6811
@@ -258,26 +255,21 @@
         <a href="/documentation">DOCUMENTATION</a>
       </h5>
       <ul class="side-nav">
-  <li class="active">
-    <i class="fa fa-chevron-right"></i>
-  <a href="/metrictypes">Metric types</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/reporting">Reporting</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/enhancement">Enhancement</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/components">Components</a>
-  </li>
-  <li >
-    <i class="fa fa-chevron-right"></i>
-  <a href="/background">Background</a>
-  </li>
+          <li class="active">
+          <i class="fa fa-chevron-right"></i> <a href="/metrictypes">Metric types</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/reporting">Reporting</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/enhancement">Enhancement</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/components">Components</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/background">Background</a>
+          </li>
       </ul>
       </div>
 
