@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta id="layout-head" />
+    <title>Avaje Metrics - Java Application performance metrics</title>
+      
+    <link rel="shortcut icon" href="/images/favicon.ico" >
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/pygments.css" rel="stylesheet" type="text/css" />
+    <link href="/css/site.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+</head>
+  <body>
+  <div id="wrap">    
+    <div id="header">    
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Avaje Metrics</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav pull-right">
+            <li ><a href="/"><span class="glyphicon glyphicon-home"></span>  Home</a></li>
+            <li ><a href="/quickstart">Getting Started</a></li>
+            <li ><a href="/support">Support</a></li>
+            <li class="active"><a href="/documentation">Documentation</a></li>
+            <li ><a href="https://github.com/avaje-metric"> <i class="fa fa-github"></i> Github</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+  </div>
+  <div id="main">    
+<div class="jumbotron mini">
+    <div class="container">
+      <h1><a href="/documentation">Documentation</a> / LongAdder </h1>
+    </div>
+  </div>
+
+  <div class="container">
+  <div class="row">
+
+    <div class="page-content col-lg-9">
+      <h2>LongAdder</h2>
+
+<a class="anchor" name="longAdder"></a>
+
+<h3>LongAdder</h3>
+<div class="bs-callout bs-callout-info" role="callout">
+  <p>
+  LongAdder and LongMaxUpdater are key enabling technology.
+  </p>
+</div>
+<p>
+  Doug Lea and company have built some counters to do exactly what we need as part of JSR166e/JDK8. Avaje Metrics makes
+  use of LongAdder and LongMaxUpdater (backported from JDK8). Some might say that Avaje Metrics is an glorified wrapper
+  for LongAdder and LongMaxUpdater.
+</p>
+
+<p>
+  Compared to AtomicLong what LongAdder does is <strong>massively reduce potential contention</strong> when multiple
+  threads are updating the value. It does this by splitting the single counter into multiple counters.
+</p>
+
+<p>
+  The costs of this approach relative to AtomicLong are:
+<ul>
+  <li><strong>More memory</strong> - Multiple underlying long values</li>
+  <li><strong>Slower reads</strong> - A read means that all the underlying values need to be sumed up</li>
+  <li><strong>Its not Atomic</strong> - The returned sum is <em>NOT</em> an
+    atomic snapshot; invocation in the absence of concurrent
+    updates returns an accurate result, but concurrent updates that
+    occur while the sum is being calculated might not be
+    incorporated.
+  </li>
+</ul>
+</p>
+
+
+<p>
+  For the Avaje metrics we only read periodically when we collect the metrics and this is done in a background
+  thread. We undestand that relative to AtomicLong it takes a little more memory and is not atomic but this is
+  more than offset by the fact that we can safely add it into our application code without the concern that it
+  would increase contention.
+</p>
+
+<h4>JavaDoc for LongAdder</h4>
+
+<div class="syntax java"><div class="highlight"><pre> <span class="cm">/**</span>
+<span class="cm">  * One or more variables that together maintain an initially zero</span>
+<span class="cm">  * {@code long} sum.  When updates (method {@link #add}) are contended</span>
+<span class="cm">  * across threads, the set of variables may grow dynamically to reduce</span>
+<span class="cm">  * contention. Method {@link #sum} (or, equivalently, {@link</span>
+<span class="cm">  * #longValue}) returns the current total combined across the</span>
+<span class="cm">  * variables maintaining the sum.</span>
+<span class="cm">  *</span>
+<span class="cm">  * This class is usually preferable to {@link AtomicLong} when</span>
+<span class="cm">  * multiple threads update a common sum that is used for purposes such</span>
+<span class="cm">  * as collecting statistics, not for fine-grained synchronization</span>
+<span class="cm">  * control.  Under low update contention, the two classes have similar</span>
+<span class="cm">  * characteristics. But under high contention, expected throughput of</span>
+<span class="cm">  * this class is significantly higher, at the expense of higher space</span>
+<span class="cm">  * consumption.</span>
+<span class="cm">  *</span>
+<span class="cm">  * This class extends {@link Number}, but does &lt;em&gt;not&lt;/em&gt; define</span>
+<span class="cm">  * methods such as {@code equals}, {@code hashCode} and {@code</span>
+<span class="cm">  * compareTo} because instances are expected to be mutated, and so are</span>
+<span class="cm">  * not useful as collection keys.</span>
+<span class="cm">  *</span>
+<span class="cm">  * &lt;em&gt;jsr166e note: This class is targeted to be placed in</span>
+<span class="cm">  * java.util.concurrent.atomic.&lt;/em&gt;</span>
+<span class="cm">  *</span>
+<span class="cm">  * @since 1.8</span>
+<span class="cm">  * @author Doug Lea</span>
+<span class="cm">  */</span>
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">LongAdder</span> <span class="kd">extends</span> <span class="n">Striped64</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</pre></div>
+</div>
+    </div>
+
+    <div class="col-lg-3 hidden-md">
+
+      <div class="side-bar">
+      <h5>
+
+        <a href="/documentation">DOCUMENTATION</a>
+      </h5>
+      <ul class="side-nav">
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/metrictypes">Metric types</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/reporting">Reporting</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/enhancement">Enhancement</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/annotations">Annotations</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/components">Components</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/background">Background</a>
+          </li>
+          <li class="active">
+          <i class="fa fa-chevron-right"></i> <a href="/longadder">LongAdder</a>
+          </li>
+      </ul>
+      </div>
+
+    </div>
+
+  </div> <!-- /.row -->
+  </div>  <!-- /.container -->
+  <div id="pre-footer"></div>
+  </div>
+</div>
+
+<footer id="footer">
+ <div class="doc-footer">
+  <ul class="doc-footer-links">
+    <li><a href="/">Home</a></li>
+    <li> | </li>
+    <li><a href="/documentation">Documentation</a></li>
+  </ul>
+ </div>
+</footer>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  </body>
+</html>

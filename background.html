@@ -64,47 +64,103 @@
 
 <h5 class="mvm">Quick links: </h5>
 <ul>
-  <li><a href="#motivation">Project motivation</a></li>
-  <li><a href="#bucket">BucketTimedMetic</a></li>
-  <li><a href="#counter">CounterMetric</a></li>
-  <li><a href="#value">ValueMetric</a></li>
-  <li><a href="#gaugelong">GaugeLongMetric</a></li>
-  <li><a href="#gaugedouble">GaugeDoubleMetric</a></li>
+  <li><a href="#motivation">Why another metrics library?</a></li>
+  <li><a href="#movingaverages">Moving Averages</a></li>
+  <li><a href="#histograms">Histograms and Percentiles</a></li>
+  <li><a href="#modes">Application Modes - Normal, Heavy, Unresponsive</a></li>
+  <li><a href="#bucket">BucketTimedMetric</a></li>
+  <li><a href="#enhancement">Agent enhancement</a></li>
 </ul>
 
 <a class="anchor" name="motivation"></a>
 
-<h3>Project motivation</h3>
-
+<h3>Why another metrics library?</h3>
 <p>
-  Around 2012 I began looking for a Java metrics library to adopt. There are a great many to look at but the one that
-  I liked the most was https://github.com/codahale/metrics which is a very successful metrics library. For Timed events
-  Codahale metrics emphasises Moving Averages and
-  Histograms/percentiles. One of my driving
-  desires was to report metrics every minute or better and when I did I started to have a preference for relatively
-  simpler and cheaper counters (Count, Total, Average, Max)
+  When I began looking for a Java metrics library to adopt I ended up using and forking
+  <a href="https://github.com/codahale/metrics">Coda Hale Metrics</a> which is a very successful metrics library.
+  For Timed events Coda Hale metrics emphasises Histograms/percentiles and Moving Averages . Avaje metrics is
+  orientated towards reporting metrics every minute or better and in that scenario
+  I developed a significant preference for simpler and cheaper counters (count, total, average, max) as well as some
+  other features - separate error statistics, BucketTimedMetric.
 </p>
 
-<h5>Moving Averages</h5>
+<a class="anchor" name="movingaverages"></a>
+<h4>Moving Averages</h4>
 
 <p>
-  Moving Averages are good, but when collecting and reporting metrics every minute I found the expotentially weighted
-  moving averages
-  to be quite laggy. I found the simpler counters (Count, Total, Mean, Max) easier to interpret and represented a
-  more honest representation of the actual latency for any given minute. If you didn't collect and report the statistics
-  every minute (or more frequently) then the Moving
-  Averages would be useful great but the intention for avaje-metrics is to collect and report the statistics every
-  minute by default.
+  When collecting and reporting metrics every minute I found the expotentially weighted moving averages to be quite
+  laggy. For interpreting minute by minute activity the simpler counters (count, total, mean, max)
+  provided a much more accurate representation of the behaviour.
+</p>
+<a class="anchor" name="histograms"></a>
+<h4>Histograms and Percentiles</h4>
+<p>
+  Percentiles are definately the way to go if the period in which you are monitoring is relatively long. Said another way,
+  if the period you are collecting metrics for is 1 hour then simple counters like mean and max can be next to useless -
+  the server could have spent 55 minutes in normal millisecond response and then some resource gets maxed out and for 5 minutes
+  the reponse times went off the charts - a single mean and max covering the 1 hour period is not going to provide much insight or help. You need to
+  collect frequently enough so that you can discern the varous 'modes' of the application (normal/good, heavy load, terminal/unresponsive/dead)
+  and that the statistics of these modes are relatively separate/distinct.
+</p>
+<p>
+  Histograms typically hold a sample size of collected metrics and in this sense they require more memory. In addtion
+  they have more overhead compared to LongAdder and LongMaxUpdater.
 </p>
 
-<h5>Histograms/Percentiles</h5>
+<a class="anchor" name="modes"></a>
+<h4>Application Modes - Normal load, Heavy load, Unresponsive</h4>
 <p>
-Percentiles are definately the way to go if the period in which you are monitoring is relatively long. Said another way,
-  if the period you are collecting metrics for is 1 hour then simple counters like Mean and Max can be next to useless -
-  the server could have spent 55 minutes in normal millisecond response and then bad shit happened and for 5 minutes
-  the reponse times went off the charts - a single mean and max is not going to provide any insight into that. HOWEVER, the
-  intent is to collect every minute and once you do that statistical.
+  Generalisations for applications are dangerous but frequently applications have different 'modes' based
+  on the load they are handling.
 </p>
+<ul>
+  <li>Good / Normal Load - Server responding as expected under light or moderate load. No resources have hit their
+    limit.
+  </li>
+  <li>Heavy Load - One of the resources has hit a limit, response times take a jump.</li>
+  <li>Unresponsive - Multiple resources hitting limits (perhaps with feedback on each other), response times make large
+    jumps and tends towards unresponsive as load increases.
+  </li>
+</ul>
+<p>
+  If your application has 'modes' then the response times do not increase in some linear fashion but instead 'jump' -
+  there are inflection points at which the 'mode' changes and response times jump significantly. <em>IF</em> the collect
+  statistics cover multiple 'modes' then a single mean and max that span both of those modes is relatively unhelpful -
+  perhaps even useless.
+</p>
+<p>
+  Histograms excel when the statistics collected cover multiple 'modes' (and max and mean are not as useful).
+  If you collect frequently enough then the issue when statistics span multiple 'modes' is reduced and you can use
+  simpler and cheaper counters (count, total, mean, max).
+</p>
+
+<a class="anchor" name="bucket"></a>
+<h4>BucketTimedMetric</h4>
+
+<p>
+  One aspect of <a href="/metrictypes#bucket">BucketTimedMetric</a> is that it provides a simple way to separate the
+  statistics collected for 'normal'
+  mode response times from the other modes. Separating those statistics provides a clearer view that a single mean and
+  max
+  will not. BucketTimedMetric has other uses like clear monitoring of SLA requirements and monitoring a method that has
+  multiple execution paths (fast path with cache hit, slower path with data fetch).
+</p>
+<p>
+  BucketTimedMetric also has the nice property that it can be aggregated accurately.
+</p>
+
+<a class="anchor" name="enhancement"></a>
+<h4>Agent enhancement</h4>
+<p>
+  Agent <a href="/enhancement">enhancement</a> provides the ability to instrument an existing application without requiring code changes. With
+  the developer coding effort removed (at least for TimedMetric and BucketTimedMetric) you can get good application
+  performance metrics at low cost to the project.
+</p>
+<div class="bs-callout bs-callout-info">
+  <p>
+    No excuses - any 7+ JVM application can have performance metrics collection.
+  </p>
+</div>
     </div>
 
     <div class="col-lg-3 hidden-md">
@@ -125,10 +181,16 @@ Percentiles are definately the way to go if the period in which you are monitori
           <i class="fa fa-chevron-right"></i> <a href="/enhancement">Enhancement</a>
           </li>
           <li >
+          <i class="fa fa-chevron-right"></i> <a href="/annotations">Annotations</a>
+          </li>
+          <li >
           <i class="fa fa-chevron-right"></i> <a href="/components">Components</a>
           </li>
           <li class="active">
           <i class="fa fa-chevron-right"></i> <a href="/background">Background</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/longadder">LongAdder</a>
           </li>
       </ul>
       </div>
@@ -136,7 +198,8 @@ Percentiles are definately the way to go if the period in which you are monitori
     </div>
 
   </div> <!-- /.row -->
-  </div>  <!-- /.container -->    
+  </div>  <!-- /.container -->
+  <div id="pre-footer"></div>
   </div>
 </div>
 

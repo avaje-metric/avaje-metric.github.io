@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta id="layout-head" />
     <title>Avaje Metrics - Java Application performance metrics</title>
-          <link rel="shortcut icon" href="/images/favicon.ico" >
+      
+    <link rel="shortcut icon" href="/images/favicon.ico" >
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/pygments.css" rel="stylesheet" type="text/css" />
     <link href="/css/site.css" rel="stylesheet">
@@ -55,20 +56,14 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container page-content">
 
   <h2>1. Maven dependencies</h2>
   <p>
-    Add the following dependencies
+    Add the following dependency.
   </p>
 
 <div class="syntax xml"><div class="highlight"><pre>    <span class="nt">&lt;dependency&gt;</span>
-      <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
-      <span class="nt">&lt;artifactId&gt;</span>avaje-metric-api<span class="nt">&lt;/artifactId&gt;</span>
-      <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
-    <span class="nt">&lt;/dependency&gt;</span>
-
-    <span class="nt">&lt;dependency&gt;</span>
       <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
       <span class="nt">&lt;artifactId&gt;</span>avaje-metric-core<span class="nt">&lt;/artifactId&gt;</span>
       <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
@@ -141,7 +136,7 @@
       At this point you can run your application and metrics will be written to a csv file every minute.
     </p>
     <h5>Output example:</h5>
-    <pre><code>
+    <pre class="console"><code>
 00:00:51, lg, jvm.gc.ps-marksweep, count=4, time=1556
 00:00:51, lg, jvm.gc.ps-scavenge, count=48, time=6811
 00:00:51, dg, jvm.memory.heap, pct=23.0, init=61.75, used=210.21, committed=379.5, max=878.5
@@ -160,6 +155,9 @@
       </li>
       <li>dur=60 means that the duration that the metric covers is 60 seconds. This is effectively the number
         of seconds since the last collection (which is when the counters where last reset).
+      </li>
+      <li>
+        Some core JVM gauges for GC, Memory, Threads etc are automatically registered.
       </li>
     </ul>
 
@@ -186,7 +184,8 @@
 
 
   </div>
-  <!-- /.container -->    
+  <!-- /.container -->
+  <div id="pre-footer"></div>
   </div>
 </div>
 

@@ -79,6 +79,7 @@
     <li><a href="#value">ValueMetric</a></li>
     <li><a href="#gaugelong">GaugeLongMetric</a></li>
     <li><a href="#gaugedouble">GaugeDoubleMetric</a></li>
+    <li><a href="#jvm">Built in JVM gauges</a></li>
   </ul>
 
   <hr/>
@@ -108,6 +109,16 @@
 <span class="o">}</span>
 </pre></div>
 </div>
+
+
+  <div class="bs-callout bs-callout-info">
+    <h4>@Timed</h4>
+
+    <p>
+      If you can use the <a href="/annotations#timed">@Timed</a> annotation and <a href="/enhancement">enhancement</a> to
+      automatically add a TimedMetric.
+    </p>
+  </div>
 
   <h5>Output example:</h5>
 <pre class="console"><code> 23:59:38, tm, org.test.MyService.performLogin, count=1, avg=954, max=954, sum=954, dur=31, err.count=0
@@ -159,6 +170,17 @@
 <span class="o">}</span>
 </pre></div>
 </div>
+
+  <div class="bs-callout bs-callout-info">
+    <h4>@Timed</h4>
+
+    <p>
+      If you can specify buckets on the <a href="/annotations#bucket">@Timed</a> annotation then enhancement will define
+      a matching BucketTimedMetric.
+    </p>
+  </div>
+
+
   <a class="anchor" name="counter"></a>
   <h3>CounterMetric</h3>
   <p>
@@ -228,7 +250,7 @@
 </div>
 
   <a class="anchor" name="jvm"></a>
-  <h3>Build in JVM Gauges</h3>
+  <h3>Built in JVM gauges</h3>
   <p>
     Avaje Metrics automatically registers some core jvm gauges for memory, threads, garbage collection,
     OS load average and system uptime.
@@ -265,10 +287,16 @@
           <i class="fa fa-chevron-right"></i> <a href="/enhancement">Enhancement</a>
           </li>
           <li >
+          <i class="fa fa-chevron-right"></i> <a href="/annotations">Annotations</a>
+          </li>
+          <li >
           <i class="fa fa-chevron-right"></i> <a href="/components">Components</a>
           </li>
           <li >
           <i class="fa fa-chevron-right"></i> <a href="/background">Background</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/longadder">LongAdder</a>
           </li>
       </ul>
       </div>
@@ -276,7 +304,8 @@
     </div>
 
   </div> <!-- /.row -->
-  </div>  <!-- /.container -->    
+  </div>  <!-- /.container -->
+  <div id="pre-footer"></div>
   </div>
 </div>
 

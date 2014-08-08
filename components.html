@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta id="layout-head" />
     <title>Avaje Metrics - Java Application performance metrics</title>
-          <link rel="shortcut icon" href="/images/favicon.ico" >
+      
+    <link rel="shortcut icon" href="/images/favicon.ico" >
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/pygments.css" rel="stylesheet" type="text/css" />
     <link href="/css/site.css" rel="stylesheet">
@@ -60,6 +61,117 @@
 
     <div class="page-content col-lg-9">
       <h2>Components</h2>
+
+  <h5 class="mvm">Quick links: </h5>
+  <ul>
+    <li><a href="#api">API</a></li>
+    <li><a href="#core">Core</a></li>
+    <li><a href="#agent">Agent</a></li>
+    <li><a href="#mavenenhancer">Maven Plugin</a></li>
+    <li><a href="#logback">Logback</a></li>
+  </ul>
+
+  <div class="page-components">
+
+    <a class="anchor" name="api"></a>
+    <h3>API</h3>
+    <p>
+      Provides the public <a href="/apidocs/index.html">API</a> for adding
+      metrics via the <a href="/apidocs/org/avaje/metric/MetricManager.html">MetricManager</a>.
+    </p>
+
+<div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>avaje-metric-api<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+
+    <a class="anchor" name="core"></a>
+    <h3>Core</h3>
+    <p>
+      The default implementation of the API. Additionally has
+      <code>MetricReportManager</code> which collects the metrics
+      and sends them to reporters.
+    </p>
+
+<div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>avaje-metric-core<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+
+    <a class="anchor" name="agent"></a>
+    <h3>Agent</h3>
+    <p>
+      The enhancement agent. Typically used via the maven plugin.
+    </p>
+
+<div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>avaje-metric-agent<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+    <a class="anchor" name="mavenenhancer"></a>
+
+    <h3>Maven Enhancement Plugin</h3>
+    <p>
+      Maven plugin to perform the enhancement.
+    </p>
+
+<div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+
+    <span class="nt">&lt;plugin&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>enhance-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+          <span class="nt">&lt;id&gt;</span>main<span class="nt">&lt;/id&gt;</span>
+          <span class="nt">&lt;phase&gt;</span>process-classes<span class="nt">&lt;/phase&gt;</span>
+          <span class="nt">&lt;configuration&gt;</span>
+            <span class="nt">&lt;classSource&gt;</span>target/classes<span class="nt">&lt;/classSource&gt;</span>
+            <span class="nt">&lt;packages&gt;</span>org.example.myapp.**<span class="nt">&lt;/packages&gt;</span>
+            <span class="nt">&lt;transformArgs&gt;</span>debug=1<span class="nt">&lt;/transformArgs&gt;</span>
+          <span class="nt">&lt;/configuration&gt;</span>
+          <span class="nt">&lt;goals&gt;</span>
+            <span class="nt">&lt;goal&gt;</span>enhance<span class="nt">&lt;/goal&gt;</span>
+          <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+      <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+
+  <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+</pre></div>
+</div>
+
+    <a class="anchor" name="logback"></a>
+    <h3>Logback</h3>
+    <p>
+      Provides a Logback appender that has counters for the number of Error and Warning messages that
+      are logged.
+    </p>
+
+    <a class="anchor" name="cxf"></a>
+    <h3>CXF</h3>
+    <p>
+      Code needs updating.
+    </p>
+
+    <a class="anchor" name="ebean"></a>
+    <h3>EbeanORM</h3>
+    <p>
+      Planned.
+    </p>
+
+  </div>
     </div>
 
     <div class="col-lg-3 hidden-md">
@@ -71,19 +183,25 @@
       </h5>
       <ul class="side-nav">
           <li >
-          <i class="fa fa-chevron-right"></i><a href="/metrictypes">Metric types</a>
+          <i class="fa fa-chevron-right"></i> <a href="/metrictypes">Metric types</a>
           </li>
           <li >
-          <i class="fa fa-chevron-right"></i><a href="/reporting">Reporting</a>
+          <i class="fa fa-chevron-right"></i> <a href="/reporting">Reporting</a>
           </li>
           <li >
-          <i class="fa fa-chevron-right"></i><a href="/enhancement">Enhancement</a>
+          <i class="fa fa-chevron-right"></i> <a href="/enhancement">Enhancement</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/annotations">Annotations</a>
           </li>
           <li class="active">
-          <i class="fa fa-chevron-right"></i><a href="/components">Components</a>
+          <i class="fa fa-chevron-right"></i> <a href="/components">Components</a>
           </li>
           <li >
-          <i class="fa fa-chevron-right"></i><a href="/background">Background</a>
+          <i class="fa fa-chevron-right"></i> <a href="/background">Background</a>
+          </li>
+          <li >
+          <i class="fa fa-chevron-right"></i> <a href="/longadder">LongAdder</a>
           </li>
       </ul>
       </div>
@@ -91,7 +209,8 @@
     </div>
 
   </div> <!-- /.row -->
-  </div>  <!-- /.container -->    
+  </div>  <!-- /.container -->
+  <div id="pre-footer"></div>
   </div>
 </div>
 
