@@ -297,3 +297,6 @@ pre.console {
 .page-components .syntax.xml {
   max-width: 700px;
 }
+.max-700 {
+  max-width: 700px;
+}
