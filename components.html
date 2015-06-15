@@ -73,6 +73,13 @@
 
   <div class="page-components">
 
+
+    <a class="anchor" name="central"></a>
+    <h3>Maven Central</h3>
+    <p>
+      View the latest dependencies in <a target="_blank" href="http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.avaje.metric%22">Maven central</a>.
+    </p>
+
     <a class="anchor" name="api"></a>
     <h3>API</h3>
     <p>
@@ -83,7 +90,7 @@
 <div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
   <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
   <span class="nt">&lt;artifactId&gt;</span>avaje-metric-api<span class="nt">&lt;/artifactId&gt;</span>
-  <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;version&gt;</span>4.4.0<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </pre></div>
 </div>
@@ -99,7 +106,7 @@
 <div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
   <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
   <span class="nt">&lt;artifactId&gt;</span>avaje-metric-core<span class="nt">&lt;/artifactId&gt;</span>
-  <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;version&gt;</span>4.4.1<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </pre></div>
 </div>
@@ -113,7 +120,7 @@
 <div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
   <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
   <span class="nt">&lt;artifactId&gt;</span>avaje-metric-agent<span class="nt">&lt;/artifactId&gt;</span>
-  <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;version&gt;</span>4.2.1<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </pre></div>
 </div>
@@ -130,13 +137,12 @@
     <span class="nt">&lt;plugin&gt;</span>
       <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
       <span class="nt">&lt;artifactId&gt;</span>enhance-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
-      <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;version&gt;</span>4.2.1<span class="nt">&lt;/version&gt;</span>
       <span class="nt">&lt;executions&gt;</span>
         <span class="nt">&lt;execution&gt;</span>
           <span class="nt">&lt;id&gt;</span>main<span class="nt">&lt;/id&gt;</span>
           <span class="nt">&lt;phase&gt;</span>process-classes<span class="nt">&lt;/phase&gt;</span>
           <span class="nt">&lt;configuration&gt;</span>
-            <span class="nt">&lt;classSource&gt;</span>target/classes<span class="nt">&lt;/classSource&gt;</span>
             <span class="nt">&lt;packages&gt;</span>org.example.myapp.**<span class="nt">&lt;/packages&gt;</span>
             <span class="nt">&lt;transformArgs&gt;</span>debug=1<span class="nt">&lt;/transformArgs&gt;</span>
           <span class="nt">&lt;/configuration&gt;</span>

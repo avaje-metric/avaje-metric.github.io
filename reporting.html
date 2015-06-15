@@ -65,9 +65,7 @@
   <h5 class="mvm">Quick links: </h5>
   <ul>
     <li><a href="#reportManager">MetricReportManager</a></li>
-    <li><a href="#file">FileReporter</a></li>
     <li><a href="#metricReporter">MetricReporter interface</a></li>
-
   </ul>
 
 
@@ -81,56 +79,24 @@
   </p>
 
   <p>
-    MetricReportManager can support 2 ReportWriters so if you wish to write the metrics both to the
-    local file system and additionally send them to a remote repository you can do that.
+    MetricReportManager can support ReportWriters for reporting the aggregate metrics as well as
+    the 'Per request' timings.
   </p>
   <h4>Example: MetricReportManager</h4>
-  <div class="syntax java"><div class="highlight"><pre>  <span class="kn">import</span> <span class="nn">org.avaje.metric.report.FileReporter</span><span class="o">;</span>
+  <div class="syntax java"><div class="highlight"><pre>  <span class="kn">import</span> <span class="nn">org.avaje.metric.report.MetricReportConfig</span><span class="o">;</span>
   <span class="kn">import</span> <span class="nn">org.avaje.metric.report.MetricReportManager</span><span class="o">;</span>
   <span class="o">...</span>
 
-  <span class="c1">// Just use the simple FileReporter that comes with avaje-metric-core.</span>
+  <span class="c1">// Default to using the simple FileReporters that come with avaje-metric-core.</span>
   <span class="c1">// Writes metrics in a csv format every 60 seconds. Defaults to write a</span>
   <span class="c1">// daily file and keep a maximum of 20 files</span>
 
-  <span class="n">FileReporter</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileReporter</span><span class="o">();</span>
-  <span class="n">MetricReportManager</span> <span class="n">reportManager</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricReportManager</span><span class="o">(</span><span class="mi">60</span><span class="o">,</span> <span class="n">file</span><span class="o">);</span>
+  <span class="n">MetricReportConfig</span> <span class="n">config</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricReportConfig</span><span class="o">();</span>
+  <span class="n">config</span><span class="o">.</span><span class="na">setFreqInSeconds</span><span class="o">(</span><span class="mi">60</span><span class="o">);</span>
+
+  <span class="n">MetricReportManager</span> <span class="n">reportManager</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricReportManager</span><span class="o">(</span><span class="n">config</span><span class="o">);</span>
+
   
-</pre></div>
-</div>
-
-  <a class="anchor" name="file"></a>
-  <h3>FileReporter</h3>
-  <p>
-    FileReporter writes the metrics to the local file system. It will write to a daily file
-    by adding the date into the name of the file it writes to. You can specify the maximum
-    number of files that you want to keep and FileReporter will delete any older metric files
-    automatically.
-  </p>
-
-<div class="syntax java"><div class="highlight"><pre>  <span class="cm">/**</span>
-<span class="cm">   * Wire up the MetricReportManager with appropriate ReportWriters.</span>
-<span class="cm">   */</span>
-  <span class="nd">@Singleton</span>
-  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">MetricService</span> <span class="o">{</span>
-
-    <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">MetricService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-
-    <span class="kd">final</span> <span class="n">MetricReportManager</span> <span class="n">reportManager</span><span class="o">;</span>
-
-    <span class="nd">@Autowired</span>
-    <span class="kd">public</span> <span class="nf">MetricService</span><span class="o">(</span><span class="n">String</span> <span class="n">directory</span><span class="o">,</span> <span class="n">String</span> <span class="n">fileName</span><span class="o">,</span> <span class="kt">int</span> <span class="n">freqInSeconds</span><span class="o">)</span> <span class="o">{</span>
-
-      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;metrics directory:{} file:{} freqInSeconds:{}&quot;</span><span class="o">,</span> <span class="n">directory</span><span class="o">,</span> <span class="n">fileName</span><span class="o">,</span> <span class="n">freqInSeconds</span><span class="o">);</span>
-
-      <span class="n">CsvReportWriter</span> <span class="n">csvReportWriter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CsvReportWriter</span><span class="o">();</span>
-
-      <span class="c1">// specify the directory to write the metrics to and fileName prefix</span>
-      <span class="n">FileReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileReporter</span><span class="o">(</span><span class="n">directory</span><span class="o">,</span> <span class="n">fileName</span><span class="o">,</span> <span class="n">csvReportWriter</span><span class="o">);</span>
-
-      <span class="n">reportManager</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricReportManager</span><span class="o">(</span><span class="n">freqInSeconds</span><span class="o">,</span> <span class="n">reporter</span><span class="o">);</span>
-    <span class="o">}</span>
-  <span class="o">}</span>
 </pre></div>
 </div>
 

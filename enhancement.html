@@ -99,13 +99,12 @@
     <span class="nt">&lt;plugin&gt;</span>
       <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
       <span class="nt">&lt;artifactId&gt;</span>enhance-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
-      <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;version&gt;</span>4.2.1<span class="nt">&lt;/version&gt;</span>
       <span class="nt">&lt;executions&gt;</span>
         <span class="nt">&lt;execution&gt;</span>
           <span class="nt">&lt;id&gt;</span>main<span class="nt">&lt;/id&gt;</span>
           <span class="nt">&lt;phase&gt;</span>process-classes<span class="nt">&lt;/phase&gt;</span>
           <span class="nt">&lt;configuration&gt;</span>
-            <span class="nt">&lt;classSource&gt;</span>target/classes<span class="nt">&lt;/classSource&gt;</span>
             <span class="nt">&lt;packages&gt;</span>org.example.myapp.**<span class="nt">&lt;/packages&gt;</span>
             <span class="nt">&lt;transformArgs&gt;</span>debug=1<span class="nt">&lt;/transformArgs&gt;</span>
           <span class="nt">&lt;/configuration&gt;</span>
@@ -135,7 +134,7 @@
 <div class="syntax xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
   <span class="nt">&lt;groupId&gt;</span>org.avaje.metric<span class="nt">&lt;/groupId&gt;</span>
   <span class="nt">&lt;artifactId&gt;</span>avaje-metric-agent<span class="nt">&lt;/artifactId&gt;</span>
-  <span class="nt">&lt;version&gt;</span>3.5.0<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;version&gt;</span>4.2.1<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </pre></div>
 </div>
@@ -201,11 +200,13 @@
 <h5>ENHANCE METHODS</h5>
 <p>
   Each timed method is enhanced using the ASM AdviceAdapter. In Java terms it looks
-  something like the below.
+  something like the code below.
 </p>
 <div class="syntax java"><div class="highlight"><pre><span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span> <span class="o">{</span>
 
-  <span class="c1">// local field to store the start nanos</span>
+  <span class="c1">// local variables to store the start nanos</span>
+  <span class="c1">// and active status of the &#39;Per request&#39; timing</span>
+  <span class="kt">boolean</span> <span class="n">_$metricActiveThreadContext</span> <span class="o">=</span> <span class="n">_$metric_1</span><span class="o">.</span><span class="na">isActiveThreadContext</span><span class="o">();</span>
   <span class="kt">long</span> <span class="n">_$metricStart</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
   <span class="k">try</span> <span class="o">{</span>
 
@@ -213,12 +214,12 @@
     <span class="o">...</span>
 
     <span class="c1">// opCode is one of the return opcodes;</span>
-    <span class="n">_$metric_1</span><span class="o">.</span><span class="na">operationEnd</span><span class="o">(</span><span class="n">opCode</span><span class="o">,</span> <span class="n">_$metricStart</span><span class="o">);</span>
+    <span class="n">_$metric_1</span><span class="o">.</span><span class="na">operationEnd</span><span class="o">(</span><span class="n">opCode</span><span class="o">,</span> <span class="n">_$metricStart</span><span class="o">,</span> <span class="n">_$metricActiveThreadContext</span><span class="o">);</span>
 
   <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">RuntimeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
 
     <span class="c1">// opCode = ATHROW;</span>
-    <span class="n">_$metric_1</span><span class="o">.</span><span class="na">operationEnd</span><span class="o">(</span><span class="n">opCode</span><span class="o">,</span> <span class="n">_$metricStart</span><span class="o">);</span>
+    <span class="n">_$metric_1</span><span class="o">.</span><span class="na">operationEnd</span><span class="o">(</span><span class="n">opCode</span><span class="o">,</span> <span class="n">_$metricStart</span><span class="o">,</span> <span class="n">_$metricActiveThreadContext</span><span class="o">);</span>
     <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
   <span class="o">}</span>
 <span class="o">}</span>
