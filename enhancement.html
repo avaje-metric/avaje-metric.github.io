@@ -232,6 +232,16 @@
   code the added bytecode is still executed but the TimedMetric.operationEnd() method is a NOOP.
   The operationEnd() methods do look a little clunky on the API but it serves a reasonable purpose.
 </p>
+<h3>Overhead</h3>
+<p>
+  The overhead of an enhanced method should be in the order of <em>140 nanoseconds</em>.
+  Micro benchmarks are notoriously difficult but I believe 140 nanoseconds to be a good
+  indication of the overhead added by the timed metric enhancement.
+</p>
+<p>
+  For perspective, executing approx 7000 methods with an overhead of 140 nanoseconds
+  would add 1 millisecond to execution time.
+</p>
     </div>
 
     <div class="col-lg-3 hidden-md">
